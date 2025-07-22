@@ -11,10 +11,10 @@ use WHSymfony\WHItemIndexTableBundle\Config\SortDirection;
  */
 readonly class ItemTableColumn
 {
-	public ?SortDirection $defaultSortDirection;
-	public bool $isDefaultSortByColumn;
+	final public ?SortDirection $defaultSortDirection;
+	final public bool $isDefaultSortByColumn;
 
-	public function __construct(
+	final public function __construct(
 		/** @var string Request query value (for sort-by columns) + HTML class for this column */
 		public string $slug,
 		/** @var string The header label for this column */

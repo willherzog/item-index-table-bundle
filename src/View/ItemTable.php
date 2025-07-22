@@ -18,7 +18,7 @@ class ItemTable
 	 *
 	 * @var string[] Always two keys: `sing` and `plur`
 	 */
-	public readonly array $htmlClass;
+	final public readonly array $htmlClass;
 
 	private array $columns = [];
 	private bool $haveDefaultSortByColumn = false;
@@ -29,7 +29,7 @@ class ItemTable
 	 *
 	 * @uses EnglishInflector to pluralize $itemClassSing if $itemClassPlur is not set
 	 */
-	public function __construct(string $itemClassSing, ?string $itemClassPlur = null)
+	final public function __construct(string $itemClassSing, ?string $itemClassPlur = null)
 	{
 		if( $itemClassPlur === null ) {
 			$itemClassParts = explode('-', $itemClassSing);
@@ -47,7 +47,7 @@ class ItemTable
 	/**
 	 * @throws MultipleDefaultSortByColumnsException if attempting to add more than one column with $isDefaultSortByColumn = TRUE
 	 */
-	public function addColumn(ItemTableColumn $column): static
+	final public function addColumn(ItemTableColumn $column): static
 	{
 		if( $column->isDefaultSortByColumn ) {
 			if( $this->haveDefaultSortByColumn ) {
@@ -65,7 +65,7 @@ class ItemTable
 	/**
 	 * @return ItemTableColumn[]
 	 */
-	public function getColumns(): array
+	final public function getColumns(): array
 	{
 		return $this->columns;
 	}
