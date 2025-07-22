@@ -19,8 +19,8 @@ readonly class ItemTableColumn
 		public string $slug,
 		/** @var string The header label for this column */
 		public string $label,
-		/** @var string The template to include/render for table cells in this column */
-		public string $template,
+		/** @var string The template to include or render for table cells in this column */
+		public string $view,
 		/** @var string (Optional) The entity property / database column name for sort-by purposes; setting this makes this a "sort-by" column */
 		public ?string $sortByProperty = null,
 		/** @var SortDirection (Optional) The default sort direction for this column (i.e. ascending or descending) */
