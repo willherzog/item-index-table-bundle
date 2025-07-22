@@ -8,6 +8,7 @@ use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
 use WHSymfony\WHItemIndexTableBundle\Config\SortDirection;
+use WHSymfony\WHItemIndexTableBundle\Exception\InvalidItemTableOrColumnException;
 use WHSymfony\WHItemIndexTableBundle\Pagination\Filter\SortByColumnFilter;
 use WHSymfony\WHItemIndexTableBundle\View\ItemTableColumn;
 
@@ -18,6 +19,7 @@ class WHItemIndexTableExtension extends AbstractExtension
 {
 	public function __construct(
 		private readonly bool $toggleDirectionForSameColumn,
+		private readonly bool $useSortByPropertyInRequests,
 		private readonly RequestStack $requestStack
 	)
 	{}
@@ -31,6 +33,10 @@ class WHItemIndexTableExtension extends AbstractExtension
 
 	public function sortByColumnRouteParams(ItemTableColumn $column, bool $isCurrentSortByColumn, ?SortDirection $directionToForce = null): array
 	{
+		if( !$column->sortByProperty ) {
+			throw new InvalidItemTableOrColumnException(sprintf('Table column with slug "%s" is not a "sort-by" column (i.e. its sortByProperty is empty).', $column->slug));
+		}
+
 		$request = $this->requestStack->getCurrentRequest();
 
 		// Filter out "sortby" and "sortdir"
@@ -43,7 +49,7 @@ class WHItemIndexTableExtension extends AbstractExtension
 			ARRAY_FILTER_USE_KEY
 		);
 
-		$requestQueries[SortByColumnFilter::SORT_BY_REQUEST_QUERY] = $column->slug;
+		$requestQueries[SortByColumnFilter::SORT_BY_REQUEST_QUERY] = $this->useSortByPropertyInRequests ? $column->sortByProperty : $column->slug;
 
 		if( $directionToForce !== null ) {
 			$newSortDir = $directionToForce;

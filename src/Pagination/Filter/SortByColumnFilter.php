@@ -9,7 +9,7 @@ use WHSymfony\WHItemPaginatorBundle\Filter\ItemFilter;
 use WHSymfony\WHItemPaginatorBundle\Paginator\ItemPaginator;
 
 use WHSymfony\WHItemIndexTableBundle\Config\SortDirection;
-use WHSymfony\WHItemIndexTableBundle\Exception\InvalidItemTableException;
+use WHSymfony\WHItemIndexTableBundle\Exception\InvalidItemTableOrColumnException;
 use WHSymfony\WHItemIndexTableBundle\Exception\UnknownSortByColumnException;
 use WHSymfony\WHItemIndexTableBundle\Pagination\SortByColumnPaginator;
 use WHSymfony\WHItemIndexTableBundle\View\ItemTable;
@@ -22,11 +22,23 @@ class SortByColumnFilter implements ItemFilter, HasRequestQuery, HasDefaultValue
 	public const SORT_BY_REQUEST_QUERY = 'sortby';
 	public const SORT_DIR_REQUEST_QUERY = 'sortdir';
 
+	static private bool $useSortByPropertyInRequests;
+
 	protected readonly array $columnNames;
 	protected readonly string $defaultSortByColumn;
 
 	private readonly string $sortByColumn;
 	private readonly SortDirection $sortByDirection;
+
+	/**
+	 * @internal
+	 */
+	static public function setUseSortByPropertyInRequests(bool $setting): void
+	{
+		if( !isset(self::$useSortByPropertyInRequests) ) {
+			self::$useSortByPropertyInRequests = $setting;
+		}
+	}
 
 	public function __construct(ItemTable $tableView, protected readonly bool $throwForInvalidColumn = false)
 	{
@@ -37,15 +49,17 @@ class SortByColumnFilter implements ItemFilter, HasRequestQuery, HasDefaultValue
 				continue;
 			}
 
+			$columnName = (self::$useSortByPropertyInRequests ?? false) ? $tableColumn->sortByProperty : $tableColumn->slug;
+
 			if( $tableColumn->isDefaultSortByColumn ) {
-				$this->defaultSortByColumn = $tableColumn->slug;
+				$this->defaultSortByColumn = $columnName;
 			}
 
-			$columnNames[$tableColumn->slug] = $tableColumn->sortByProperty;
+			$columnNames[$columnName] = $tableColumn->sortByProperty;
 		}
 
 		if( !isset($this->defaultSortByColumn) ) {
-			throw new InvalidItemTableException('The $tableView argument must include a default sort-by column.');
+			throw new InvalidItemTableOrColumnException('The $tableView argument must include a default sort-by column.');
 		}
 
 		$this->columnNames = $columnNames;
