@@ -1,0 +1,29 @@
+{
+	"name": "willherzog/symfony-app-menu-bundle",
+	"description": "A bundle to facilitate creating a dynamic index table with the ability to set the column used for item sorting.",
+    "type": "symfony-bundle",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Will Herzog",
+            "email": "willherzog@gmail.com"
+        }
+    ],
+	"repositories": [
+		{
+			"type": "vcs",
+			"url": "https://github.com/willherzog/symfony-item-paginator-bundle"
+		}
+	],
+    "require": {
+		"php": "^8.3",
+		"symfony/framework-bundle": "^7.0",
+		"symfony/string": "^7.0",
+		"symfony/translation": "^7.0",
+		"symfony/twig-bundle": "^7.0",
+        "willherzog/symfony-item-paginator-bundle": "dev-main"
+	},
+    "autoload": {
+        "psr-4": { "WHSymfony\\WHItemIndexTableBundle\\": "src/" }
+    }
+}
