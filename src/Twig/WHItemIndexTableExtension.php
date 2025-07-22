@@ -66,7 +66,7 @@ class WHItemIndexTableExtension extends AbstractExtension
 			}
 		}
 
-		$requestQueries[SortByColumnFilter::SORT_DIR_REQUEST_QUERY] = $newSortDir->value;
+		$requestQueries[SortByColumnFilter::SORT_DIR_REQUEST_QUERY] = strtolower($newSortDir->value);
 
 		return array_merge($request->attributes->get('_route_params'), $requestQueries);
 	}
