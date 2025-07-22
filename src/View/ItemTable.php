@@ -45,7 +45,7 @@ class ItemTable
 	}
 
 	/**
-	 * @throws MultipleDefaultSortByColumnsException If attempting to add more than one column with $isDefaultSortByColumn = TRUE
+	 * @throws MultipleDefaultSortByColumnsException if attempting to add more than one column with $isDefaultSortByColumn = TRUE
 	 */
 	public function addColumn(ItemTableColumn $column): static
 	{
