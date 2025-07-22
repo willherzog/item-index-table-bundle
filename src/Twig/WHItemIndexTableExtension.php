@@ -11,6 +11,7 @@ use WHSymfony\WHItemIndexTableBundle\Config\SortDirection;
 use WHSymfony\WHItemIndexTableBundle\Exception\InvalidItemTableOrColumnException;
 use WHSymfony\WHItemIndexTableBundle\Pagination\Filter\SortByColumnFilter;
 use WHSymfony\WHItemIndexTableBundle\View\ItemTableColumn;
+use WHSymfony\WHItemIndexTableBundle\View\UseSortByPropertyForRequests;
 
 /**
  * @author Will Herzog <willherzog@gmail.com>
@@ -19,7 +20,6 @@ class WHItemIndexTableExtension extends AbstractExtension
 {
 	public function __construct(
 		private readonly bool $toggleDirectionForSameColumn,
-		private readonly bool $useSortByPropertyInRequests,
 		private readonly RequestStack $requestStack
 	)
 	{}
@@ -49,7 +49,11 @@ class WHItemIndexTableExtension extends AbstractExtension
 			ARRAY_FILTER_USE_KEY
 		);
 
-		$requestQueries[SortByColumnFilter::SORT_BY_REQUEST_QUERY] = $this->useSortByPropertyInRequests ? $column->sortByProperty : $column->slug;
+		if( $column instanceof UseSortByPropertyForRequests ) {
+			$requestQueries[SortByColumnFilter::SORT_BY_REQUEST_QUERY] = $column->sortByProperty;
+		} else {
+			$requestQueries[SortByColumnFilter::SORT_BY_REQUEST_QUERY] = $column->slug;
+		}
 
 		if( $directionToForce !== null ) {
 			$newSortDir = $directionToForce;

@@ -13,6 +13,7 @@ use WHSymfony\WHItemIndexTableBundle\Exception\InvalidItemTableOrColumnException
 use WHSymfony\WHItemIndexTableBundle\Exception\UnknownSortByColumnException;
 use WHSymfony\WHItemIndexTableBundle\Pagination\SortByColumnPaginator;
 use WHSymfony\WHItemIndexTableBundle\View\ItemTable;
+use WHSymfony\WHItemIndexTableBundle\View\UseSortByPropertyForRequests;
 
 /**
  * @author Will Herzog <willherzog@gmail.com>
@@ -28,7 +29,7 @@ class SortByColumnFilter implements ItemFilter, HasRequestQuery, HasDefaultValue
 	private readonly string $sortByColumn;
 	private readonly SortDirection $sortByDirection;
 
-	public function __construct(ItemTable $tableView, protected readonly bool $throwForInvalidColumn = false, bool $useColumnSortByProperty = false)
+	public function __construct(ItemTable $tableView, protected readonly bool $throwForInvalidColumn = false)
 	{
 		$columnNames = [];
 
@@ -37,7 +38,11 @@ class SortByColumnFilter implements ItemFilter, HasRequestQuery, HasDefaultValue
 				continue;
 			}
 
-			$columnName = $useColumnSortByProperty ? $tableColumn->sortByProperty : $tableColumn->slug;
+			if( $tableColumn instanceof UseSortByPropertyForRequests ) {
+				$columnName = $tableColumn->sortByProperty;
+			} else {
+				$columnName = $tableColumn->slug;
+			}
 
 			if( $tableColumn->isDefaultSortByColumn ) {
 				$this->defaultSortByColumn = $columnName;
