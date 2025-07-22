@@ -8,7 +8,6 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigura
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
 
-use WHSymfony\WHItemIndexTableBundle\Pagination\Filter\SortByColumnFilter;
 use WHSymfony\WHItemIndexTableBundle\Twig\WHItemIndexTableExtension;
 
 /**
@@ -45,7 +44,5 @@ class WHItemIndexTableBundle extends AbstractBundle
 				])
 				->tag('twig.extension')
 		;
-
-		SortByColumnFilter::setUseSortByPropertyInRequests($config['use_column_sort_by_property_in_requests']);
 	}
 }

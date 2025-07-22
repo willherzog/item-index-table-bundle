@@ -22,25 +22,13 @@ class SortByColumnFilter implements ItemFilter, HasRequestQuery, HasDefaultValue
 	public const SORT_BY_REQUEST_QUERY = 'sortby';
 	public const SORT_DIR_REQUEST_QUERY = 'sortdir';
 
-	static private bool $useSortByPropertyInRequests;
-
 	protected readonly array $columnNames;
 	protected readonly string $defaultSortByColumn;
 
 	private readonly string $sortByColumn;
 	private readonly SortDirection $sortByDirection;
 
-	/**
-	 * @internal
-	 */
-	static public function setUseSortByPropertyInRequests(bool $setting): void
-	{
-		if( !isset(self::$useSortByPropertyInRequests) ) {
-			self::$useSortByPropertyInRequests = $setting;
-		}
-	}
-
-	public function __construct(ItemTable $tableView, protected readonly bool $throwForInvalidColumn = false)
+	public function __construct(ItemTable $tableView, protected readonly bool $throwForInvalidColumn = false, bool $useColumnSortByProperty = false)
 	{
 		$columnNames = [];
 
@@ -49,7 +37,7 @@ class SortByColumnFilter implements ItemFilter, HasRequestQuery, HasDefaultValue
 				continue;
 			}
 
-			$columnName = (self::$useSortByPropertyInRequests ?? false) ? $tableColumn->sortByProperty : $tableColumn->slug;
+			$columnName = $useColumnSortByProperty ? $tableColumn->sortByProperty : $tableColumn->slug;
 
 			if( $tableColumn->isDefaultSortByColumn ) {
 				$this->defaultSortByColumn = $columnName;
