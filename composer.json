@@ -1,5 +1,5 @@
 {
-	"name": "willherzog/symfony-app-menu-bundle",
+	"name": "willherzog/item-index-table-bundle",
 	"description": "A bundle to facilitate creating a dynamic index table with the ability to set the column used for item sorting.",
     "type": "symfony-bundle",
     "license": "MIT",
