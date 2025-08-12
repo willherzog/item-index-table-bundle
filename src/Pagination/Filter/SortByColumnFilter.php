@@ -4,6 +4,7 @@ namespace WHSymfony\WHItemIndexTableBundle\Pagination\Filter;
 
 use Symfony\Component\HttpFoundation\Request;
 
+use WHSymfony\WHItemPaginatorBundle\Filter\ExcludeFromActiveFiltersCount;
 use WHSymfony\WHItemPaginatorBundle\Filter\{HasDefaultValue,HasRequestQuery};
 use WHSymfony\WHItemPaginatorBundle\Filter\ItemFilter;
 use WHSymfony\WHItemPaginatorBundle\Paginator\ItemPaginator;
@@ -18,7 +19,7 @@ use WHSymfony\WHItemIndexTableBundle\View\UseSortByPropertyForRequests;
 /**
  * @author Will Herzog <willherzog@gmail.com>
  */
-class SortByColumnFilter implements ItemFilter, HasRequestQuery, HasDefaultValue
+class SortByColumnFilter implements ItemFilter, HasRequestQuery, HasDefaultValue, ExcludeFromActiveFiltersCount
 {
 	public const SORT_BY_REQUEST_QUERY = 'sortby';
 	public const SORT_DIR_REQUEST_QUERY = 'sortdir';
