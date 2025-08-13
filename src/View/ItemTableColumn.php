@@ -39,9 +39,9 @@ readonly class ItemTableColumn
 				// Default callback implementation matching the logic previously found in SortByColumnFilter::apply()
 				$this->sortByFunc = function(ItemPaginator $paginator, ?SortDirection $sortDirection = null) use ($sortByProperty): void {
 					if( $sortDirection !== null ) {
-						$paginator->setOrderBy($sortByProperty, $sortDirection === SortDirection::Ascending);
+						$paginator->addOrderBy($sortByProperty, $sortDirection->value);
 					} else {
-						$paginator->setOrderBy($sortByProperty);
+						$paginator->addOrderBy($sortByProperty);
 					}
 				};
 			}
