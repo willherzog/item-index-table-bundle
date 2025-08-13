@@ -49,7 +49,7 @@ class SortByColumnFilter implements ItemFilter, HasRequestQuery, HasDefaultValue
 				$columnName = $column->slug;
 			}
 
-			if( $column->slug === $defaultSortByColumn ) {
+			if( $column->slug === $defaultSortByColumn && !isset($this->defaultSortByColumn) ) {
 				$this->defaultSortByColumn = $columnName;
 			}
 
