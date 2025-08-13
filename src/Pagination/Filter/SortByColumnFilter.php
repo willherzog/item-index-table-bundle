@@ -32,10 +32,7 @@ class SortByColumnFilter implements ItemFilter, HasRequestQuery, HasDefaultValue
 
 	public function __construct(ItemTable $tableView, protected readonly bool $throwForInvalidColumn = false)
 	{
-		if( ($defaultSortByColumn = $tableView->getDefaultSortByColumn()) === null ) {
-			throw new InvalidItemTableOrColumnException('The $tableView argument must have a default sort-by column.');
-		}
-
+		$defaultSortByColumn = $tableView->getDefaultSortByColumn();
 		$columnNames = [];
 
 		foreach( $tableView->getColumns() as $column )  {
@@ -49,11 +46,15 @@ class SortByColumnFilter implements ItemFilter, HasRequestQuery, HasDefaultValue
 				$columnName = $column->slug;
 			}
 
-			if( $column->slug === $defaultSortByColumn && !isset($this->defaultSortByColumn) ) {
+			if( !isset($this->defaultSortByColumn) && ($defaultSortByColumn === null || $column->slug === $defaultSortByColumn) ) {
 				$this->defaultSortByColumn = $columnName;
 			}
 
 			$columnNames[$columnName] = $column->sortByProperty;
+		}
+
+		if( $columnNames === [] ) {
+			throw new InvalidItemTableOrColumnException('The $tableView argument must include one or more sort-by columns (i.e. columns with a non-empty $sortByProperty).');
 		}
 
 		if( !isset($this->defaultSortByColumn) ) {
