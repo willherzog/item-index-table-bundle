@@ -5,13 +5,12 @@ namespace WHSymfony\WHItemIndexTableBundle\Twig;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 use Twig\Extension\AbstractExtension;
-use Twig\TwigFunction;
+use Twig\{TwigFunction,TwigTest};
 
 use WHSymfony\WHItemIndexTableBundle\Config\SortDirection;
 use WHSymfony\WHItemIndexTableBundle\Exception\InvalidItemTableOrColumnException;
 use WHSymfony\WHItemIndexTableBundle\Pagination\Filter\SortByColumnFilter;
 use WHSymfony\WHItemIndexTableBundle\View\ItemTableColumn;
-use WHSymfony\WHItemIndexTableBundle\View\UseSortByPropertyForRequests;
 
 /**
  * @author Will Herzog <willherzog@gmail.com>
@@ -31,10 +30,17 @@ class WHItemIndexTableExtension extends AbstractExtension
 		];
 	}
 
+	public function getTests(): array
+	{
+		return [
+			new TwigTest('sort_by_column', [$this, 'isSortByColumn'])
+		];
+	}
+
 	public function sortByColumnRouteParams(ItemTableColumn $column, bool $isCurrentSortByColumn, ?SortDirection $directionToForce = null): array
 	{
-		if( !$column->sortByProperty ) {
-			throw new InvalidItemTableOrColumnException(sprintf('Table column with slug "%s" is not a "sort-by" column (i.e. its sortByProperty is empty).', $column->slug));
+		if( $column->sortByFunc === null ) {
+			throw new InvalidItemTableOrColumnException(sprintf('Table column with slug "%s" is not a "sort-by" column (i.e. its $sortByFunc property has not been set).', $column->slug));
 		}
 
 		$request = $this->requestStack->getCurrentRequest();
@@ -49,11 +55,7 @@ class WHItemIndexTableExtension extends AbstractExtension
 			ARRAY_FILTER_USE_KEY
 		);
 
-		if( $column instanceof UseSortByPropertyForRequests ) {
-			$requestQueries[SortByColumnFilter::SORT_BY_REQUEST_QUERY] = $column->sortByProperty;
-		} else {
-			$requestQueries[SortByColumnFilter::SORT_BY_REQUEST_QUERY] = $column->slug;
-		}
+		$requestQueries[SortByColumnFilter::SORT_BY_REQUEST_QUERY] = $column->slug;
 
 		if( $directionToForce !== null ) {
 			$newSortDir = $directionToForce;
@@ -73,5 +75,10 @@ class WHItemIndexTableExtension extends AbstractExtension
 		$requestQueries[SortByColumnFilter::SORT_DIR_REQUEST_QUERY] = strtolower($newSortDir->value);
 
 		return array_merge($request->attributes->get('_route_params'), $requestQueries);
+	}
+
+	public function isSortByColumn(mixed $column): bool
+	{
+		return ($column instanceof ItemTableColumn) && $column->sortByFunc !== null;
 	}
 }

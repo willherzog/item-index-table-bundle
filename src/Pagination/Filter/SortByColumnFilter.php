@@ -14,7 +14,6 @@ use WHSymfony\WHItemIndexTableBundle\Exception\InvalidItemTableOrColumnException
 use WHSymfony\WHItemIndexTableBundle\Exception\UnknownSortByColumnException;
 use WHSymfony\WHItemIndexTableBundle\Pagination\SortByColumnPaginator;
 use WHSymfony\WHItemIndexTableBundle\View\ItemTable;
-use WHSymfony\WHItemIndexTableBundle\View\UseSortByPropertyForRequests;
 
 /**
  * @author Will Herzog <willherzog@gmail.com>
@@ -24,7 +23,7 @@ class SortByColumnFilter implements ItemFilter, HasRequestQuery, HasDefaultValue
 	public const SORT_BY_REQUEST_QUERY = 'sortby';
 	public const SORT_DIR_REQUEST_QUERY = 'sortdir';
 
-	protected readonly array $columnNames;
+	protected readonly array $sortByColumns;
 	protected readonly string $defaultSortByColumn;
 
 	private readonly string $sortByColumn;
@@ -36,21 +35,15 @@ class SortByColumnFilter implements ItemFilter, HasRequestQuery, HasDefaultValue
 		$columnNames = [];
 
 		foreach( $tableView->getColumns() as $column )  {
-			if( !$column->sortByProperty ) {
+			if( $column->sortByFunc === null ) {
 				continue;
 			}
 
-			if( $column instanceof UseSortByPropertyForRequests ) {
-				$columnName = $column->sortByProperty;
-			} else {
-				$columnName = $column->slug;
-			}
-
 			if( !isset($this->defaultSortByColumn) && ($defaultSortByColumn === null || $column->slug === $defaultSortByColumn) ) {
-				$this->defaultSortByColumn = $columnName;
+				$this->defaultSortByColumn = $column->slug;
 			}
 
-			$columnNames[$columnName] = $column->sortByProperty;
+			$columnNames[$column->slug] = $column->sortByFunc;
 		}
 
 		if( $columnNames === [] ) {
@@ -61,7 +54,7 @@ class SortByColumnFilter implements ItemFilter, HasRequestQuery, HasDefaultValue
 			throw new InvalidItemTableOrColumnException(sprintf('The specified default sort-by column ("%s") did not match any of the actual table columns.', $defaultSortByColumn));
 		}
 
-		$this->columnNames = $columnNames;
+		$this->sortByColumns = $columnNames;
 	}
 
 	public function getRequestQueryName(): string
@@ -83,9 +76,9 @@ class SortByColumnFilter implements ItemFilter, HasRequestQuery, HasDefaultValue
 	{
 		if( $request->query->has(self::SORT_BY_REQUEST_QUERY) ) {
 			if( ($columnNameFromRequest = $request->query->getString(self::SORT_BY_REQUEST_QUERY)) !== '' ) {
-				if( $this->columnNames === [] || key_exists($columnNameFromRequest, $this->columnNames) ) {
+				if( $this->sortByColumns === [] || key_exists($columnNameFromRequest, $this->sortByColumns) ) {
 					$this->sortByColumn = $columnNameFromRequest;
-				} elseif( $this->columnNames !== [] && $this->throwForInvalidColumn ) {
+				} elseif( $this->sortByColumns !== [] && $this->throwForInvalidColumn ) {
 					throw new UnknownSortByColumnException(sprintf('"%s" does not match the name of a valid sort-by column.', $columnNameFromRequest));
 				}
 			}
@@ -106,16 +99,6 @@ class SortByColumnFilter implements ItemFilter, HasRequestQuery, HasDefaultValue
 
 	public function apply(ItemPaginator $paginator): void
 	{
-		$sortByProperty = $this->getSortByColumn();
-
-		if( $this->columnNames !== [] ) {
-			$sortByProperty = $this->columnNames[$sortByProperty];
-		}
-
-		if( isset($this->sortByDirection) ) {
-			$paginator->setOrderBy($sortByProperty, $this->sortByDirection === SortDirection::Ascending);
-		} else {
-			$paginator->setOrderBy($sortByProperty);
-		}
+		$this->sortByColumns[$this->getSortByColumn()]($paginator, $this->sortByDirection ?? null);
 	}
 }
