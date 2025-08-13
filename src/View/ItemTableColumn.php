@@ -13,7 +13,8 @@ use WHSymfony\WHItemIndexTableBundle\Config\SortDirection;
  */
 readonly class ItemTableColumn
 {
-	public ?callable $sortByFunc;
+	/** @var callable|null */
+	public mixed $sortByFunc;
 	public ?SortDirection $defaultSortDirection;
 	public string $htmlClass;
 
