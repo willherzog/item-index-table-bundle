@@ -39,7 +39,7 @@ class WHItemIndexTableExtension extends AbstractExtension
 
 	public function sortByColumnRouteParams(ItemTableColumn $column, bool $isCurrentSortByColumn, ?SortDirection $directionToForce = null): array
 	{
-		if( $column->sortByFunc === null ) {
+		if( !is_callable($column->sortByFunc) ) {
 			throw new InvalidItemTableOrColumnException(sprintf('Table column with slug "%s" is not a "sort-by" column (i.e. its $sortByFunc property has not been set).', $column->slug));
 		}
 
@@ -79,6 +79,6 @@ class WHItemIndexTableExtension extends AbstractExtension
 
 	public function isSortByColumn(mixed $column): bool
 	{
-		return ($column instanceof ItemTableColumn) && $column->sortByFunc !== null;
+		return ($column instanceof ItemTableColumn) && is_callable($column->sortByFunc);
 	}
 }

@@ -35,7 +35,7 @@ class SortByColumnFilter implements ItemFilter, HasRequestQuery, HasDefaultValue
 		$columnNames = [];
 
 		foreach( $tableView->getColumns() as $column )  {
-			if( $column->sortByFunc === null ) {
+			if( !is_callable($column->sortByFunc) ) {
 				continue;
 			}
 
