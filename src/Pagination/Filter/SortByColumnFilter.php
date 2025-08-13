@@ -32,28 +32,32 @@ class SortByColumnFilter implements ItemFilter, HasRequestQuery, HasDefaultValue
 
 	public function __construct(ItemTable $tableView, protected readonly bool $throwForInvalidColumn = false)
 	{
+		if( ($defaultSortByColumn = $tableView->getDefaultSortByColumn()) === null ) {
+			throw new InvalidItemTableOrColumnException('The $tableView argument must have a default sort-by column.');
+		}
+
 		$columnNames = [];
 
-		foreach( $tableView->getColumns() as $tableColumn )  {
-			if( !$tableColumn->sortByProperty ) {
+		foreach( $tableView->getColumns() as $column )  {
+			if( !$column->sortByProperty ) {
 				continue;
 			}
 
-			if( $tableColumn instanceof UseSortByPropertyForRequests ) {
-				$columnName = $tableColumn->sortByProperty;
+			if( $column instanceof UseSortByPropertyForRequests ) {
+				$columnName = $column->sortByProperty;
 			} else {
-				$columnName = $tableColumn->slug;
+				$columnName = $column->slug;
 			}
 
-			if( $tableColumn->isDefaultSortByColumn ) {
+			if( $column->slug === $defaultSortByColumn ) {
 				$this->defaultSortByColumn = $columnName;
 			}
 
-			$columnNames[$columnName] = $tableColumn->sortByProperty;
+			$columnNames[$columnName] = $column->sortByProperty;
 		}
 
 		if( !isset($this->defaultSortByColumn) ) {
-			throw new InvalidItemTableOrColumnException('The $tableView argument must include a default sort-by column.');
+			throw new InvalidItemTableOrColumnException(sprintf('The specified default sort-by column ("%s") did not match any of the actual table columns.', $defaultSortByColumn));
 		}
 
 		$this->columnNames = $columnNames;

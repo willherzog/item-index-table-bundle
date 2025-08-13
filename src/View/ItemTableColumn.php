@@ -11,9 +11,6 @@ use WHSymfony\WHItemIndexTableBundle\Config\SortDirection;
  */
 readonly class ItemTableColumn
 {
-	final public ?SortDirection $defaultSortDirection;
-	final public bool $isDefaultSortByColumn;
-
 	final public function __construct(
 		/** @var string Request query value (for sort-by columns) + HTML class for this column */
 		public string $slug,
@@ -24,16 +21,6 @@ readonly class ItemTableColumn
 		/** @var string (Optional) The entity property / database column name for sort-by purposes; setting this makes this a "sort-by" column */
 		public ?string $sortByProperty = null,
 		/** @var SortDirection (Optional) The default sort direction for this column (i.e. ascending or descending) */
-		SortDirection $defaultSortDirection = SortDirection::Ascending,
-		/** @var bool (Optional) Whether this column should be the *default* sort-by column */
-		bool $isDefaultSortByColumn = false
-	) {
-		if( $this->sortByProperty ) {
-			$this->defaultSortDirection = $defaultSortDirection;
-			$this->isDefaultSortByColumn = $isDefaultSortByColumn;
-		} else {
-			$this->defaultSortDirection = null;
-			$this->isDefaultSortByColumn = false;
-		}
-	}
+		public ?SortDirection $defaultSortDirection = SortDirection::Ascending
+	) {}
 }

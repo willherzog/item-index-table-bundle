@@ -4,8 +4,6 @@ namespace WHSymfony\WHItemIndexTableBundle\View;
 
 use Symfony\Component\String\Inflector\EnglishInflector;
 
-use WHSymfony\WHItemIndexTableBundle\Exception\MultipleDefaultSortByColumnsException;
-
 /**
  * The view for an item index table.
  *
@@ -21,7 +19,7 @@ class ItemTable
 	final public readonly array $htmlClass;
 
 	private array $columns = [];
-	private bool $haveDefaultSortByColumn = false;
+	private string $defaultSortByColumn;
 
 	/**
 	 * @param string $itemClassSing Singular form of HTML class for the particular item type
@@ -44,20 +42,16 @@ class ItemTable
 		];
 	}
 
-	/**
-	 * @throws MultipleDefaultSortByColumnsException if attempting to add more than one column with $isDefaultSortByColumn = TRUE
-	 */
 	final public function addColumn(ItemTableColumn $column): static
 	{
-		if( $column->isDefaultSortByColumn ) {
-			if( $this->haveDefaultSortByColumn ) {
-				throw new MultipleDefaultSortByColumnsException('This item index table already has a default sort-by column (there can be only one!).');
-			} else {
-				$this->haveDefaultSortByColumn = true;
-			}
-		}
-
 		$this->columns[] = $column;
+
+		return $this;
+	}
+
+	final public function setDefaultSortByColumn(string $columnSlug): static
+	{
+		$this->defaultSortByColumn = $columnSlug;
 
 		return $this;
 	}
@@ -68,5 +62,10 @@ class ItemTable
 	final public function getColumns(): array
 	{
 		return $this->columns;
+	}
+
+	final public function getDefaultSortByColumn(): ?string
+	{
+		return $this->defaultSortByColumn ?? null;
 	}
 }
